@@ -2,13 +2,115 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Nexbot Robot Scene</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Entity 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
-        iframe { width: 100%; height: 100%; border: none; }
+        body { margin: 0; background: #000; overflow: hidden; }
+        #canvas-container { width: 100vw; height: 100vh; }
     </style>
 </head>
 <body>
-    <iframe src="https://my.spline.design/nexbotrobotcharacterconcept-F10Rcv1g7Rb4DBPC4t1yJFAE/" frameborder="0"></iframe>
+
+    <div id="canvas-container"></div>
+
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+            "@react-three/fiber": "https://esm.sh/@react-three/fiber@8.15.11?external=three",
+            "@react-three/drei": "https://esm.sh/@react-three/drei@9.88.11?external=three",
+            "react": "https://esm.sh/react@18.2.0",
+            "react-dom": "https://esm.sh/react-dom@18.2.0"
+          }
+        }
+    </script>
+
+    <script type="module">
+        import React, { useRef, useState, useMemo } from 'react'
+        import { createRoot } from 'react-dom'
+        import * as THREE from 'three'
+        import { Canvas, useFrame } from '@react-three/fiber'
+        import { Float, MeshTransmissionMaterial, OrbitControls, MeshDistortMaterial } from '@react-three/drei'
+
+        function NeuralRobot() {
+            const headRef = useRef()
+            const eyeRef = useRef()
+
+            // Слежение за мышкой
+            useFrame((state) => {
+                if (headRef.current) {
+                    // Плавный поворот за курсором
+                    const x = (state.mouse.y * 0.4)
+                    const y = (state.mouse.x * 0.4)
+                    headRef.current.rotation.x = THREE.MathUtils.lerp(headRef.current.rotation.x, -x, 0.1)
+                    headRef.current.rotation.y = THREE.MathUtils.lerp(headRef.current.rotation.y, y, 0.1)
+                }
+            })
+
+            return React.createElement('group', null,
+                // ГОЛОВА (Следит за мышью)
+                React.createElement('group', { ref: headRef, position: [0, 0.8, 0] },
+                    // Стеклянный корпус (Технология 2026)
+                    React.createElement('mesh', null,
+                        React.createElement('sphereGeometry', { args: [1, 64, 64] }),
+                        React.createElement(MeshTransmissionMaterial, {
+                            backside: true,
+                            samples: 4,
+                            thickness: 0.5,
+                            chromaticAberration: 0.05,
+                            anisotropy: 0.1,
+                            distortion: 0.1,
+                            color: "#c0f0ff"
+                        })
+                    ),
+                    // Неоновый визор
+                    React.createElement('mesh', { position: [0, 0, 0.8] },
+                        React.createElement('boxGeometry', { args: [1.2, 0.05, 0.2] }),
+                        React.createElement('meshStandardMaterial', { 
+                            color: "#00ffff", 
+                            emissive: "#00ffff", 
+                            emissiveIntensity: 5 
+                        })
+                    )
+                ),
+
+                // ТЕЛО (Эффект жидкого металла)
+                React.createElement(Float, { speed: 2, rotationIntensity: 0.2, floatIntensity: 0.5 },
+                    React.createElement('mesh', { position: [0, -1.2, 0] },
+                        React.createElement('sphereGeometry', { args: [1.2, 64, 64] }),
+                        React.createElement(MeshDistortMaterial, {
+                            color: "#101010",
+                            speed: 4,
+                            distort: 0.4,
+                            metalness: 1,
+                            roughness: 0.1
+                        })
+                    )
+                )
+            )
+        }
+
+        function App() {
+            return React.createElement(Canvas, { camera: { position: [0, 0, 6] } },
+                React.createElement('color', { attach: "background", args: ["#000"] }),
+                React.createElement('ambientLight', { intensity: 0.5 }),
+                React.createElement('spotLight', { position: [10, 10, 10], intensity: 2, color: "#00ffff" }),
+                React.createElement('pointLight', { position: [-10, -10, -10], color: "#ff00ff" }),
+                React.createElement(NeuralRobot),
+                React.createElement(OrbitControls, { enableZoom: false, enablePan: false })
+            )
+        }
+
+        const root = createRoot(document.getElementById('canvas-container'))
+        root.render(React.createElement(App))
+    </script>
+
+    <div class="absolute top-10 left-10 z-10 pointer-events-none">
+        <h1 class="text-white text-4xl font-black tracking-tighter opacity-80">NEURAL ENTITY</h1>
+        <p class="text-cyan-400 text-sm font-mono tracking-widest uppercase">System Status: Active // 2026</p>
+    </div>
+
 </body>
 </html>
